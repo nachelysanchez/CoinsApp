@@ -24,12 +24,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.example.coinsapp.data.remote.dto.Coins
+import com.example.coinsapp.ui.coins.CoinsConsulta
+import com.example.coinsapp.ui.coins.CoinsRegistro
 import com.example.coinsapp.ui.coins.CoinsViewModel
+import com.example.coinsapp.ui.componentes.CoinItem
+import com.example.coinsapp.ui.componentes.SplashScreen
 import com.example.coinsapp.ui.theme.CoinsAppTheme
+import com.example.coinsapp.utils.Screen
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.NumberFormat
 import java.util.*
@@ -43,7 +51,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colors.secondaryVariant
                 ) {
                     MyAppCoins()
                 }
@@ -53,96 +61,23 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyAppCoins(
-    viewModel: CoinsViewModel = hiltViewModel()
-) {
-    val state = viewModel.state.value
-    Column(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(modifier = Modifier.fillMaxSize()){
+fun MyAppCoins(){
+    val navHostController = rememberNavController()
 
-            items(state.coins){coin ->
-                CoinItem(
-                    coin = coin,
-                    onClick = {}
-                )
-            }
+    NavHost(
+        navController = navHostController,
+        startDestination = Screen.SplashScreen.route
+    ){
+        composable(Screen.CoinsConsulta.route){
+            CoinsConsulta(navHostController = navHostController)
         }
-
-        if (state.isLoading)
-            CircularProgressIndicator()
-
-
+        composable(Screen.CoinsRegistro.route){
+            CoinsRegistro(navHostController = navHostController)
+        }
+        composable(Screen.SplashScreen.route){
+            SplashScreen(navHostController = navHostController)
+        }
     }
-}
-
-@Composable
-fun CoinItem(
-    coin : Coins,
-    onClick : (Coins) -> Unit
-) {
-
-    Column(modifier = Modifier
-        .padding(8.dp))
-    {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .height(30.dp)
-            .padding(2.dp).clickable { onClick(coin)},
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(coin.imageUrl)
-                    .transformations(CircleCropTransformation())
-                    .build(),
-                contentDescription = null
-            )
-
-            Text(
-                text = "${NumberFormatD(coin.valor)}",
-                fontStyle = Italic,
-                style = MaterialTheme.typography.body1,
-                textAlign = TextAlign.End,
-                color = androidx.compose.ui.graphics.Color.Green
-            )
-
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(
-                text = "${coin.descripcion}",
-                style = MaterialTheme.typography.body1,
-                fontWeight = Bold
-            )
-        }
-
-        Spacer(
-            modifier = Modifier
-                .height(3.dp)
-        )
-
-        Divider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .width(2.dp),
-            color = androidx.compose.ui.graphics.Color.DarkGray
-        )
-
-    }
-
-}
-
-
-fun NumberFormatD(
-    number : Double?
-) : String{
-    val country : String = "US";
-    val language : String = "en";
-    val str : String = NumberFormat.getCurrencyInstance(Locale(language, country)).format(number);
-    return str;
 }
 
 @Preview(showBackground = true)

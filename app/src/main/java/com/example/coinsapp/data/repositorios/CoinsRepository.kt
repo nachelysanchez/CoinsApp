@@ -2,9 +2,13 @@ package com.example.coinsapp.data.repositorios
 
 import com.example.coinsapp.data.remote.dto.Coins
 import com.example.coinsapp.data.remote.dto.CoinsApi
+import com.example.coinsapp.di.AppModule
 import com.example.coinsapp.utils.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
+import retrofit2.Callback
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -27,5 +31,31 @@ class CoinsRepository @Inject constructor(
             //debe verificar tu conexion a internet
             emit(Resource.Error(e.message ?: "verificar tu conexion a internet"))
         }
+    }
+
+    suspend fun postCoin(
+        coin: Coins
+    ) : String
+    {
+        var message : String
+        var call = api.postCoin(coin)
+        var coin = call.body()
+
+        if(call.isSuccessful){
+            message = "The coin had saved successfully..."
+        }
+        else{
+            message = "Sorry. Error"
+        }
+        return message;
+        /*withContext(Dispatchers.Main){
+            try{
+                //TODO: EVALUAR DONDE ES QUE SE PIERDE EL COIN
+                val coinResponse = api.postCoin(coin)
+            }
+            catch(e : Exception){
+                val message = e.message
+            }
+        }*/
     }
 }
