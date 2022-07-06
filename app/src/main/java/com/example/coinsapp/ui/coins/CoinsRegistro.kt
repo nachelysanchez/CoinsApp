@@ -80,7 +80,10 @@ fun CoinsRegistro(
                     imagenError = viewModel.imagen.isBlank()
 
                     if(!nombreError && !precioError){
-                        if(viewModel.precio.toDouble() > 0){
+                        if(isNumeric(viewModel.precio) == false){
+                            Toast.makeText(contexto, "Digite el precio de manera correcta", Toast.LENGTH_LONG).show();
+                        }
+                        else if(viewModel.precio.toDouble() > 0){
                             //TODO: LLENA CLASES
                             viewModel.Post()
                             Toast.makeText(contexto, "La moneda se guardó correctamente", Toast.LENGTH_LONG).show()
@@ -204,3 +207,12 @@ fun LlenaClase(
         imageUrl = imagenUrl
     )
 }*/
+
+fun isNumeric(a : String ) : Boolean{
+    try{
+        a.toDouble();
+        return true;
+    }catch(e : NumberFormatException){
+        return false;
+    }
+}
